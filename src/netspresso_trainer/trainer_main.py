@@ -70,7 +70,7 @@ def run_distributed_training_script(gpu_ids, data, augmentation, model, training
 
 def train_with_yaml_impl(gpus: Optional[Union[List, int]], data: Union[Path, str], augmentation: Union[Path, str],
                          model: Union[Path, str], training: Union[Path, str],
-                         logging: Union[Path, str], environment: Union[Path, str], log_level: str = LOG_LEVEL):
+                         logging: Union[Path, str], environment: Union[Path, str], log_level: str = LOG_LEVEL, trial=None):
     conf_environment = OmegaConf.load(environment).environment
     gpus = get_gpus_from_parser_and_config(gpus, conf_environment)
     assert isinstance(gpus, (list, int))
@@ -95,7 +95,7 @@ def train_with_yaml_impl(gpus: Optional[Union[List, int]], data: Union[Path, str
                 model_name=config_summary.model_name,
                 is_graphmodule_training=config_summary.is_graphmodule_training,
                 logging_dir=config_summary.logging_dir,
-                log_level=log_level
+                log_level=log_level, trial=trial
             )
         else:
             run_distributed_training_script(
@@ -112,7 +112,7 @@ def train_with_yaml(
     augmentation: Union[Path, str],
     model: Union[Path, str], training: Union[Path, str],
     logging: Union[Path, str], environment: Union[Path, str],
-    gpus: Optional[str] = None, log_level: str = LOG_LEVEL
+    gpus: Optional[str] = None, log_level: str = LOG_LEVEL, trial=None
 ):
 
     gpus: Union[List, int] = parse_gpu_ids(gpus)
@@ -125,7 +125,8 @@ def train_with_yaml(
         training=training,
         logging=logging,
         environment=environment,
-        log_level=log_level
+        log_level=log_level, 
+        trial=trial
     )
 
     return logging_dir

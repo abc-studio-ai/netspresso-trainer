@@ -18,8 +18,10 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Literal, Optional
 
 import torch
+import optuna
 import torch.nn as nn
 from omegaconf import DictConfig
+from optuna.trial._trial import Trial
 
 from ..loggers.base import TrainingLogger
 from ..utils.record import Timer
@@ -35,7 +37,8 @@ class BasePipeline(ABC):
         model_name: str,
         model: nn.Module,
         logger: Optional[TrainingLogger],
-        timer: Timer,
+        timer: Timer, 
+        trial: Trial=None, 
     ):
         super(BasePipeline, self).__init__()
         self.conf = conf
@@ -45,6 +48,7 @@ class BasePipeline(ABC):
         self.model = model
         self.logger = logger
         self.timer = timer
+        self.trial = trial
 
     @property
     def sample_input(self):
@@ -71,6 +75,13 @@ class BasePipeline(ABC):
             learning_rate=learning_rate,
             elapsed_time=elapsed_time
         )
+
+        # This should be evaluate but evaluate only compute 
+        # after several epochs, leading to unnecessary resource consumption.
+        if prefix == "training":
+            self.trial.report(metrics["PCK"]["mean"], step=epoch)
+            if self.trial.should_prune():
+                raise optuna.TrialPruned()
 
     @abstractmethod
     def save_summary(self):

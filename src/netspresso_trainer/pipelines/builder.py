@@ -73,7 +73,8 @@ def build_pipeline(
     is_graphmodule_training: bool,
     dataloaders: Dict[str, DataLoader],
     data_stats: Dict[str, Dict],
-    profile: bool = False
+    profile: bool = False, 
+    trial=None
 ):
     assert task in SUPPORTING_TASK_LIST, f"No such task! (task: {task})"
 
@@ -141,7 +142,8 @@ def build_pipeline(
                                             model_ema=model_ema,
                                             start_epoch=start_epoch,
                                             cur_epoch=cur_epoch,
-                                            profile=profile)
+                                            profile=profile, 
+                                            trial=trial)
 
     elif pipeline_type == 'evaluation':
         eval_dataloader: DataLoader = dataloaders['test']
