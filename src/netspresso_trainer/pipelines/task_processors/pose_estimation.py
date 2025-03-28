@@ -74,7 +74,7 @@ class PoseEstimationProcessor(BaseTaskProcessor):
             }
             return dict(logs.items())
 
-    def valid_step(self, eval_model, batch, loss_factory, metric_factory):
+    def valid_step(self, eval_model, batch, loss_factory, metric_factory, with_image: bool=False):
         eval_model.eval()
         indices, images, keypoints = batch['indices'], batch['pixel_values'], batch['keypoints']
         images = images.to(self.devices)
@@ -102,11 +102,17 @@ class PoseEstimationProcessor(BaseTaskProcessor):
                 keypoints = np.concatenate(gathered_labels, axis=0)
 
         if self.single_gpu_or_rank_zero:
-            logs = {
-                'images': images.detach().cpu().numpy(),
-                'target': keypoints,
-                'pred': pred
-            }
+            if with_image:
+                logs = {
+                    'images': images.detach().cpu().numpy(),
+                    'target': keypoints,
+                    'pred': pred
+                }
+            else:
+                logs = {
+                    'target': keypoints,
+                    'pred': pred
+                }
             return dict(logs.items())
 
     def test_step(self, test_model, batch):
