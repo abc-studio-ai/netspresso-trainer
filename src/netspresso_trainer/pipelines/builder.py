@@ -73,7 +73,8 @@ def build_pipeline(
     is_graphmodule_training: bool,
     dataloaders: Dict[str, DataLoader],
     data_stats: Dict[str, Dict],
-    profile: bool = False
+    profile: bool = False, 
+    **kwargs
 ):
     assert task in SUPPORTING_TASK_LIST, f"No such task! (task: {task})"
 
@@ -118,7 +119,8 @@ def build_pipeline(
                                         step_per_epoch=train_step_per_epoch,
                                         class_map=class_map,
                                         num_sample_images=NUM_SAMPLES,
-                                        result_dir=logging_dir,)
+                                        result_dir=logging_dir, 
+                                        **kwargs)
 
         # Build pipeline
         pipeline = PIPELINES[pipeline_type](conf=conf,

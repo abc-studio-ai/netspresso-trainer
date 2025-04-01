@@ -34,7 +34,8 @@ def train_common(
     model_name: str,
     is_graphmodule_training: bool,
     logging_dir: Path,
-    log_level: Literal['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'] = 'INFO'
+    log_level: Literal['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'] = 'INFO', 
+    **kwargs
 ):
     distributed, world_size, rank, devices = set_device(conf.environment.seed)
     logger = set_logger(level=log_level, distributed=distributed)
@@ -82,7 +83,8 @@ def train_common(
                               logging_dir=logging_dir,
                               is_graphmodule_training=is_graphmodule_training,
                               dataloaders={'train': train_dataloader, 'valid': eval_dataloader},
-                              data_stats={'train': train_dataset.stats, 'valid': valid_dataset.stats})
+                              data_stats={'train': train_dataset.stats, 'valid': valid_dataset.stats}, 
+                              **kwargs)
 
     try:
         # Start train
