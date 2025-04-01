@@ -35,7 +35,7 @@ from ...utils import BackboneOutput, FXTensorType
 from ..registry import USE_INTERMEDIATE_FEATURES_TASK_LIST
 
 __all__ = ['mobilevit']
-SUPPORTING_TASK = ['classification']
+SUPPORTING_TASK = ['classification', 'pose_estimation']
 
 
 class MobileViTEmbeddings(nn.Module):
@@ -416,7 +416,7 @@ class MobileViT(MetaFormer):
         x = self.encoder(x)
         x = self.conv_1x1_exp(x)
         feat = self.pool(x)
-        return BackboneOutput(last_feature=feat)
+        return BackboneOutput(last_feature=feat, intermediate_features=[x])
 
 
 def mobilevit(task, conf_model_backbone):

@@ -42,6 +42,7 @@ class TrainingLogger():
         num_sample_images: int,
         result_dir: Union[Path, str],
         epoch: Optional[int] = None,
+        **kwargs
     ) -> None:
         super(TrainingLogger, self).__init__()
         self.conf = conf
@@ -71,7 +72,7 @@ class TrainingLogger():
             self.loggers.append(self.tensorboard_logger)
         if self.use_mlflow:
             from .mlflow import MLFlowLogger
-            self.mlflow_logger = MLFlowLogger(result_dir=self._result_dir, step_per_epoch=step_per_epoch)
+            self.mlflow_logger = MLFlowLogger(result_dir=self._result_dir, step_per_epoch=step_per_epoch, **kwargs)
             self.loggers.append(self.mlflow_logger)
         if self.use_stdout:
             total_epochs = conf.training.epochs if hasattr(conf, 'training') else None

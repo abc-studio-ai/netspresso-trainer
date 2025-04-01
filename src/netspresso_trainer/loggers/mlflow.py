@@ -15,6 +15,7 @@
 # ----------------------------------------------------------------------------
 import glob
 import os
+import optuna
 from typing import Dict, List, Literal, Optional, Union
 
 import numpy as np
@@ -33,9 +34,11 @@ except Exception as e:
 
 
 class MLFlowLogger:
-    def __init__(self, result_dir: str, step_per_epoch: int):
+    def __init__(self, result_dir: str, step_per_epoch: int, **kwargs):
         self.step_per_epoch = step_per_epoch
         self.result_dir = result_dir
+        self.trial = kwargs.get("trial")
+        self.metric_name = kwargs.get("metric_name", "losses")
         # self._setup_mlflow()
 
     def _setup_mlflow(self):
@@ -121,6 +124,19 @@ class MLFlowLogger:
         elapsed_time: Optional[float] = None,
         **kwargs,
     ):
+
+        if prefix == "training" and self.trial:
+            
+            value = (
+                metrics[self.metric_name]["mean"] 
+                if self.metric_name != "losses" 
+                else list(losses.values())[0]
+            )
+            self.trial.report(value, step=epoch)
+
+            if self.trial.should_prune():
+                raise optuna.TrialPruned()
+
         self._epoch = 0 if epoch is None else epoch
 
         if losses is not None:

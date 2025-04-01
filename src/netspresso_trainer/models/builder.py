@@ -123,7 +123,7 @@ def build_model(model_conf, num_classes, devices, distributed) -> nn.Module:
 
         model = model.to(device=devices)
         if distributed:
-            model = DDP(model, device_ids=[devices], find_unused_parameters=True)  # TODO: find_unused_parameters should be false (for now, PIDNet has problem)
+            model = DDP(model, device_ids=[devices], find_unused_parameters=False)  # TODO: find_unused_parameters should be false (for now, PIDNet has problem)
 
         return model
 

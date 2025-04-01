@@ -236,7 +236,10 @@ class TrainingPipeline(BasePipeline):
         outputs = []
         eval_model = self.model_ema.ema_model if self.model_ema else self.model
         for _idx, batch in enumerate(tqdm(self.eval_dataloader, leave=False)):
-            out = self.task_processor.valid_step(eval_model, batch, self.loss_factory, self.metric_factory)
+            if self.task_processor.__class__.__name__ == "PoseEstimationProcessor":
+                out = self.task_processor.valid_step(eval_model, batch, self.loss_factory, self.metric_factory, num_returning_samples < num_samples)
+            else:
+                out = self.task_processor.valid_step(eval_model, batch, self.loss_factory, self.metric_factory)
             if out is not None:
                 outputs.append(out)
                 if num_returning_samples < num_samples:
