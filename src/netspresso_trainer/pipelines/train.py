@@ -43,6 +43,7 @@ from ..utils.record import Timer, TrainingSummary
 from ..utils.stats import get_params_and_flops
 from .base import BasePipeline
 from .task_processors.base import BaseTaskProcessor
+from ..loggers.early_stopping import build_early_stopping
 
 NUM_SAMPLES = 16
 
@@ -87,7 +88,7 @@ class TrainingPipeline(BasePipeline):
         self.start_epoch = start_epoch
         self.cur_epoch = cur_epoch
         self.profile = profile  # TODO: provide torch_tb_profiler for training
-
+        self.early_stopping = build_early_stopping(conf)
         self.training_history: Dict[int, Dict[
             Literal['train_losses', 'valid_losses', 'train_metrics', 'valid_metrics'], Dict[str, float]
         ]] = {}
@@ -191,6 +192,14 @@ class TrainingPipeline(BasePipeline):
                         assert with_valid_logging
                         self.save_checkpoint(epoch=num_epoch)
                     logger.info("-" * 40)
+                    
+                    if with_valid_logging:
+                        should_stop, reason = self.early_stopping.early_stopping_check(self.loss_factory, self.metric_factory)
+                        if reason:
+                            logger.info(reason)
+                            logger.info("-" * 40)
+                        if should_stop:
+                            break
 
                 self.scheduler.step()  # call after reporting the current `learning_rate`
 
