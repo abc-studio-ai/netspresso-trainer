@@ -39,6 +39,7 @@ from .custom.image_proc import (
 )
 from .custom.mixing import Mixing
 from .custom.mosaic import MosaicDetection
+from .custom.albumention import Albumention
 
 TRANSFORM_DICT: Dict[str, Callable] = {
     'centercrop': CenterCrop,
@@ -62,4 +63,5 @@ TRANSFORM_DICT: Dict[str, Callable] = {
     'posetopdownaffine': PoseTopDownAffine,
     'totensor': ToTensor,
     'normalize': Normalize,
+    'albumention': Albumention,
 }
