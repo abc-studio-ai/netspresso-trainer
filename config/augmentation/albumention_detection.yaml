@@ -1,0 +1,77 @@
+augmentation:
+  train:
+    - name: albumention
+      transforms :
+        - name: OneOf
+          transforms:
+            - name: RandomRain
+              slant_range: [-15, 15]
+              drop_length: 50
+              drop_width: 1
+              drop_color: [200, 200, 200]
+              blur_value: 7
+              brightness_coefficient: 0.7
+              rain_type: default
+              p: 1.0
+            - name: RandomSnow
+              brightness_coeff: 2.5
+              snow_point_range: [0.1, 0.3]
+              method: bleach
+              p: 1.0
+            - name: RandomSunFlare
+              flare_roi: [0, 0, 1, 0.5]
+              src_radius: 400
+              src_color: [255, 255, 255]
+              angle_range: [0, 1]
+              num_flare_circles_range: [6, 10]
+              method: physics_based
+              p: 1.0        
+          p: 1.0
+              
+    - 
+      name: mosaicdetection
+      size: [640, 640]
+      mosaic_prob: 1.0
+      affine_scale: [0.5, 1.5]
+      degrees: 10.0
+      translate: 0.1
+      shear: 1.0
+      enable_mixup: False
+      mixup_prob: 0.15
+      mixup_scale: [0.8, 1.2]
+      fill: 114
+      mosaic_off_duration: 15
+    -
+      name: randomhorizontalflip
+      p: 0.5
+    - 
+      name: resize
+      size: 640
+      interpolation: bilinear
+      max_size: ~
+      resize_criteria: long
+    -
+      name: pad
+      size: 640
+      fill: 114
+    -
+      name: totensor
+      pixel_range: 1.0
+    -
+      name: normalize
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+  inference:
+    - 
+      name: resize
+      size: [640, 640]
+      interpolation: bilinear
+      max_size: ~
+      resize_criteria: ~
+    -
+      name: totensor
+      pixel_range: 1.0
+    -
+      name: normalize
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
